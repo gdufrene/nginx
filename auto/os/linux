@@ -25,6 +25,7 @@ version=$((`uname -r \
 
 version=${version:-0}
 
+ngx_binext=.so
 
 # posix_fadvise64() had been implemented in 2.5.60
 

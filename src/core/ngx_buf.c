@@ -43,6 +43,25 @@ ngx_create_temp_buf(ngx_pool_t *pool, size_t size)
     return b;
 }
 
+void
+ngx_chain_end(ngx_chain_t *chain)
+{
+    chain->next = NULL;
+    chain->buf->last_buf = 1;
+    chain->buf->last_in_chain = 1;
+
+    ngx_log_error_core(NGX_LOG_NOTICE, 
+        ngx_cycle->log, 0,
+        "buf adr:%xl start:%xl end:%xl pos:%xl last_buf:%d last_in_chain:%d",
+      (u_long) chain->buf, 
+      (u_long) chain->buf->start,
+      (u_long) chain->buf->end,
+      (u_long) chain->buf->pos,
+      (ngx_uint_t) chain->buf->last_buf,
+      (ngx_uint_t) chain->buf->last_in_chain
+    );
+}
+
 
 ngx_chain_t *
 ngx_alloc_chain_link(ngx_pool_t *pool)

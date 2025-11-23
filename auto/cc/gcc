@@ -54,6 +54,8 @@ NGX_GCC_OPT="-O"
 
 #CFLAGS="$CFLAGS -fomit-frame-pointer"
 
+CORE_LINK="$CORE_LINK -shared"
+
 case $CPU in
     pentium)
         # optimize for Pentium and Athlon

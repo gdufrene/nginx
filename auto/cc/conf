@@ -12,9 +12,9 @@ ngx_include_opt="-I "
 ngx_compile_opt="-c"
 ngx_pic_opt="-fPIC"
 ngx_objout="-o "
-ngx_binout="-o "
+ngx_binout="-shared -o "
 ngx_objext="o"
-ngx_binext=
+ngx_binext=".so"
 ngx_modext=".so"
 
 ngx_long_start=

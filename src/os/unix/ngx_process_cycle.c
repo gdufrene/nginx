@@ -280,6 +280,10 @@ ngx_single_process_cycle(ngx_cycle_t *cycle)
 {
     ngx_uint_t  i;
 
+    ngx_log_debug1(NGX_LOG_DEBUG_CORE, cycle->log, 0,
+        "(ngx_single_process_cycle) start ___ cycle: %xl", (u_long) cycle);
+
+
     if (ngx_set_environment(cycle, NULL) == NULL) {
         /* fatal */
         exit(2);
@@ -287,6 +291,8 @@ ngx_single_process_cycle(ngx_cycle_t *cycle)
 
     for (i = 0; cycle->modules[i]; i++) {
         if (cycle->modules[i]->init_process) {
+            ngx_log_debug1(NGX_LOG_DEBUG_CORE, cycle->log, 0,
+                "(ngx_single_process_cycle) Init module #%l ", i);
             if (cycle->modules[i]->init_process(cycle) == NGX_ERROR) {
                 /* fatal */
                 exit(2);
@@ -306,7 +312,8 @@ ngx_single_process_cycle(ngx_cycle_t *cycle)
                     cycle->modules[i]->exit_process(cycle);
                 }
             }
-
+            ngx_log_debug1(NGX_LOG_DEBUG_CORE, cycle->log, 0,
+                    "(ngx_single_process_cycle) terminate ____ cycle: %xl", (u_long) cycle);
             ngx_master_process_exit(cycle);
         }
 
@@ -315,6 +322,8 @@ ngx_single_process_cycle(ngx_cycle_t *cycle)
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "reconfiguring");
 
             cycle = ngx_init_cycle(cycle);
+            ngx_log_debug1(NGX_LOG_DEBUG_CORE, cycle->log, 0,
+                "(ngx_single_process_cycle) reconfigure, init_cycle: %xl", (u_long) cycle);
             if (cycle == NULL) {
                 cycle = (ngx_cycle_t *) ngx_cycle;
                 continue;

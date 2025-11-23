@@ -9,14 +9,20 @@
 #include <ngx_core.h>
 #include <nginx.h>
 
+#include <stdio.h>
+
 
 static void ngx_show_version_info(void);
-static ngx_int_t ngx_add_inherited_sockets(ngx_cycle_t *cycle);
+// static 
+ngx_int_t ngx_add_inherited_sockets(ngx_cycle_t *cycle);
 static void ngx_cleanup_environment(void *data);
 static void ngx_cleanup_environment_variable(void *data);
-static ngx_int_t ngx_get_options(int argc, char *const *argv);
-static ngx_int_t ngx_process_options(ngx_cycle_t *cycle);
-static ngx_int_t ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv);
+// static 
+ngx_int_t ngx_get_options(int argc, char *const *argv);
+// static 
+ngx_int_t ngx_process_options(ngx_cycle_t *cycle);
+// static 
+ngx_int_t ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv);
 static void *ngx_core_module_create_conf(ngx_cycle_t *cycle);
 static char *ngx_core_module_init_conf(ngx_cycle_t *cycle, void *conf);
 static char *ngx_set_user(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
@@ -27,6 +33,34 @@ static char *ngx_set_cpu_affinity(ngx_conf_t *cf, ngx_command_t *cmd,
 static char *ngx_set_worker_processes(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf);
 static char *ngx_load_module(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
+
+ngx_core_conf_t *ngx_get_conf2(ngx_cycle_t *cycle, ngx_module_t *module) {
+    // printf("module %s index(%lu) \n", module->name, module->index);
+    return (ngx_core_conf_t*)  (cycle->conf_ctx[module->index]);
+}
+
+void ngx_dump_config_fn(ngx_cycle_t *cycle) {
+    ngx_conf_dump_t  *cd;
+    ngx_buf_t        *b;
+    ngx_uint_t        i;
+
+    cd = cycle->config_dump.elts;
+
+    for (i = 0; i < cycle->config_dump.nelts; i++) {
+
+        ngx_write_stdout("# configuration file ");
+        (void) ngx_write_fd(ngx_stdout, cd[i].name.data,
+                            cd[i].name.len);
+        ngx_write_stdout(":" NGX_LINEFEED);
+
+        b = cd[i].buffer;
+
+        (void) ngx_write_fd(ngx_stdout, b->pos, b->last - b->pos);
+        ngx_write_stdout(NGX_LINEFEED);
+    }
+    fflush(stdout);
+}
+
 #if (NGX_HAVE_DLOPEN)
 static void ngx_unload_module(void *data);
 #endif
@@ -196,11 +230,8 @@ static char **ngx_os_environ;
 int ngx_cdecl
 main(int argc, char *const *argv)
 {
-    ngx_buf_t        *b;
     ngx_log_t        *log;
-    ngx_uint_t        i;
     ngx_cycle_t      *cycle, init_cycle;
-    ngx_conf_dump_t  *cd;
     ngx_core_conf_t  *ccf;
 
     ngx_debug_init();
@@ -307,20 +338,7 @@ main(int argc, char *const *argv)
         }
 
         if (ngx_dump_config) {
-            cd = cycle->config_dump.elts;
-
-            for (i = 0; i < cycle->config_dump.nelts; i++) {
-
-                ngx_write_stdout("# configuration file ");
-                (void) ngx_write_fd(ngx_stdout, cd[i].name.data,
-                                    cd[i].name.len);
-                ngx_write_stdout(":" NGX_LINEFEED);
-
-                b = cd[i].buffer;
-
-                (void) ngx_write_fd(ngx_stdout, b->pos, b->last - b->pos);
-                ngx_write_stdout(NGX_LINEFEED);
-            }
+            ngx_dump_config_fn(cycle);
         }
 
         return 0;
@@ -334,7 +352,7 @@ main(int argc, char *const *argv)
 
     ngx_cycle = cycle;
 
-    ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
+    ccf = (ngx_core_conf_t *) ngx_get_conf2(cycle, &ngx_core_module);
 
     if (ccf->master && ngx_process == NGX_PROCESS_SINGLE) {
         ngx_process = NGX_PROCESS_MASTER;
@@ -388,7 +406,8 @@ main(int argc, char *const *argv)
 }
 
 
-static void
+// static 
+void
 ngx_show_version_info(void)
 {
     ngx_write_stderr("nginx version: " NGINX_VER_BUILD NGX_LINEFEED);
@@ -456,7 +475,8 @@ ngx_show_version_info(void)
 }
 
 
-static ngx_int_t
+// static 
+ngx_int_t
 ngx_add_inherited_sockets(ngx_cycle_t *cycle)
 {
     u_char           *p, *v, *inherited;
@@ -798,7 +818,8 @@ ngx_exec_new_binary(ngx_cycle_t *cycle, char *const *argv)
 }
 
 
-static ngx_int_t
+// static 
+ngx_int_t
 ngx_get_options(int argc, char *const *argv)
 {
     u_char     *p;
@@ -944,7 +965,8 @@ ngx_get_options(int argc, char *const *argv)
 }
 
 
-static ngx_int_t
+//  static 
+ngx_int_t
 ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)
 {
 #if (NGX_FREEBSD)
@@ -986,7 +1008,8 @@ ngx_save_argv(ngx_cycle_t *cycle, int argc, char *const *argv)
 }
 
 
-static ngx_int_t
+// static 
+ngx_int_t
 ngx_process_options(ngx_cycle_t *cycle)
 {
     u_char  *p;
