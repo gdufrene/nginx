@@ -69,7 +69,7 @@ ngx_signal_t  signals[] = {
 
     { SIGALRM, "SIGALRM", "", ngx_signal_handler },
 
-    { SIGINT, "SIGINT", "", ngx_signal_handler },
+//    { SIGINT, "SIGINT", "", ngx_signal_handler },
 
     { SIGIO, "SIGIO", "", ngx_signal_handler },
 
